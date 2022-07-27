@@ -1,0 +1,201 @@
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+#include<iostream.h>
+#include<iomanip.h>
+#include<fstream.h>
+
+class record{
+    public:char name[20],usn[20],sem[5],age[5],branch[5];
+}rec[20];
+
+char st_n[5];
+int n;
+fstream f1,f2;
+
+void retreive(){
+    
+    char name[20],usn[20],sem[5],age[5],branch[5],ind[5];
+    
+    f2.open("record.txt",ios::in);
+    
+    for(int i=0;i<n;i++){
+        f2.getline(ind,5,'|');
+        f2.getline(usn,20,'|');
+        f2.getline(name,20,'|');
+        f2.getline(age,5,'|');
+        f2.getline(sem,5,'|');
+        f2.getline(branch,5,'\n');
+        
+        if(strcmp(ind,st_n)==0){
+            cout<<"\nrec found";
+            cout<<"\n"<<usn<<"\t"<<name<<"\t"<<age<<"\t"<<sem<<"\t"<<branch<<"\n";
+        }
+    }
+    f2.close();
+}
+
+void del(char usno[]){
+    
+    char name[20],usn[20],sem[5],age[5],branch[5],ind[5];
+    int i;
+    
+    f2.open("record.txt",ios::in);
+    
+    for(i=0;i<n;i++){
+        f2.getline(ind,5,'|');
+        f2.getline(usn,20,'|');
+        f2.getline(name,20,'|');
+        f2.getline(age,5,'|');
+        f2.getline(sem,5,'|');
+        f2.getline(branch,5,'\n');
+        
+        strcpy(rec[i].usn,usn);
+        strcpy(rec[i].name,name);
+        strcpy(rec[i].age,age);
+        strcpy(rec[i].sem,sem);
+        strcpy(rec[i].branch,branch);
+    }
+    
+    int flag=-1;
+    
+    for(i=0;i<n;i++){
+        if(strcmp(rec[i].usn,usno)==0){
+            flag=i;
+        }
+    }
+    
+    if(flag==-1){
+        cout<<"error";
+        return;
+    }
+    
+    if(flag==(n-1)){
+        cout<<"\ndeleted";
+        n--;
+        return;
+    }
+    
+    for(i=flag;i<n;i++){
+        rec[i]=rec[i+1];
+    }
+    n--;
+    cout<<"\ndeleted";
+    f2.close();
+    
+    f1.open("index.txt",ios::out);
+    f2.open("record.txt",ios::out);
+    
+    for(i=0;i<n;i++){
+        f1<<rec[i].usn<<"\t"<<i<<"\n";
+        f2<<i<<"|"<<rec[i].usn<<"|"<<rec[i].name<<"|"<<rec[i].age<<"|"<<rec[i].sem<<"|"<<rec[i].branch<<"\n";
+    }
+    f1.close();
+    f2.close();
+    return;
+}
+
+int main(){
+    
+    char name[20],usn[20],sem[5],age[5],branch[5],ind[5],st_usn[20],rt_usn[20];
+    int i,j,choice,flag,flag1;
+    
+    f1.open("index.txt",ios::out);
+    f2.open("record.txt",ios::out);
+    
+    if(!f1||!f2){
+        cout<<"\ncant open";
+        exit(1);
+    }
+    
+    for(;;){
+        cout<<"\n0:exit\n1:add\n2:display\n3:search\n4:delete\n";
+        cin>>choice;
+        
+        switch(choice){
+            case 0:exit(0);
+            
+            case 1:cout<<"\nenter no:";
+                    cin>>n;
+                    
+                    for(i=0;i<n;i++){
+                        cout<<"name:";
+                        cin>>rec[i].name;
+                        cout<<"usn:";
+                        cin>>rec[i].usn;
+                        cout<<"age:";
+                        cin>>rec[i].age;
+                        cout<<"sem:";
+                        cin>>rec[i].sem;
+                        cout<<"branch:";
+                        cin>>rec[i].branch;
+                        
+                        f1<<rec[i].usn<<"|"<<i<<"\n";
+                        f2<<i<<"|"<<rec[i].usn<<"|"<<rec[i].name<<"|"<<rec[i].age<<"|"<<rec[i].sem<<"|"<<rec[i].branch<<"\n";
+                    }
+                    f1.close();
+                    f2.close();
+                    break;
+                    
+            case 2:cout<<"\n details are:";
+                    cout<<"\nUSN\tNAME\tAGE\tSEM\tBRANCH\n";
+                    for(i=0;i<n;i++){
+                        cout<<"\n"<<rec[i].usn<<"\t"<<rec[i].name<<"\t"<<rec[i].age<<"\t"<<rec[i].sem<<"\t"<<rec[i].branch<<"\n";
+                    }
+                    break;
+                    
+            case 3: cout<<"\nusn to search:";
+                    cin>>st_usn;
+                    flag1=0;
+                    
+                    f1.open("index.txt",ios::in);
+                    if(!f1){
+                        cout<<"\ncant open";
+                        exit(0);
+                    }
+                    
+                    for(i=0;i<n;i++){
+                        f1.getline(rt_usn,20,'|');
+                        f1.getline(st_n,5,'\n');
+                        if(strcmp(rt_usn,st_usn)==0){
+                        	retreive();
+                            flag1=1;
+                        }
+                    }
+                    if(!flag1){
+                        cout<<"cant";
+                    }
+                    f1.close();
+                    break;
+                
+            case 4: cout<<"\nusn to delete:";
+                    cin>>st_usn;
+                    flag=0;
+                    
+                    f1.open("index.txt",ios::in);
+                    if(!f1){
+                        cout<<"\ncant open";
+                        exit(0);
+                    }
+                    
+                    for(i=0;i<n;i++){
+                        f1.getline(rt_usn,20,'|');
+                        f1.getline(st_n,5,'\n');
+                        if(strcmp(rt_usn,st_usn)==0){
+                            del(rt_usn);
+                            flag=1;
+                        }
+                    }
+                    if(!flag){
+                        cout<<"cant";
+                    }
+                    f1.close();
+                    break;    
+                    
+            default:cout<<"\ninvalid";
+                    break;
+        }
+    }
+    return 0;
+    
+}
