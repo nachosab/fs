@@ -1,0 +1,237 @@
+#include <stdio.h>
+#include <iostream>
+#include <iomanip>
+#include <string.h>
+#include <stdlib.h>
+#include <fstream>
+using namespace std;
+
+class student
+{
+    public:
+        char name[10], usn[10], sem[5], age[5], branch[5], buffer[25];
+};
+
+student s;
+fstream file;
+
+void write_record()
+{
+    file.open("records.txt",ios::app);
+    if (!file)
+    {
+        cout << "Error opening file\n";
+        exit(0);
+    }
+    cout<<"Enter the name\n";
+    cin>>s.name;
+    cout<<"Enter the usn\n";
+    cin>>s.usn;
+    cout<<"Enter the age\n";
+    cin>>s.age;
+    cout<<"Enter the sem\n";
+    cin>>s.sem;
+    cout<<"Enter the branch\n";
+    cin>>s.branch;
+    strcpy(s.buffer, s.name);
+    strcat(s.buffer, "|");
+    strcat(s.buffer, s.usn);
+    strcat(s.buffer, "|");
+    strcat(s.buffer, s.age);
+    strcat(s.buffer, "|");
+    strcat(s.buffer, s.sem);
+    strcat(s.buffer, "|");
+    strcat(s.buffer, s.branch);
+
+    int length = strlen(s.buffer);
+
+    for (int i = 0; i < 25 - length; i++)
+    {
+        strcat(s.buffer,"!");
+    }
+    strcat(s.buffer,"\n");
+    file << s.buffer;
+    file.close();
+}
+
+void search()
+{
+    char usn[10];
+    char extra[25];
+    file.open("records.txt",ios::in);
+    if (!file)
+    {
+        cout<<"\nunable to open the file in read mode";
+        exit(0);
+    }
+    cout<<"\nenter the record's usn you want to search = ";
+    cin>>usn;
+    // unpacking the record
+    while (!file.eof())
+    {
+        file.getline(s.name, 10, '|');
+        file.getline(s.usn, 10, '|');
+        file.getline(s.age, 5, '|');
+        file.getline(s.sem, 5, '|');
+        file.getline(s.branch, 5, '!');
+        file.getline(extra, 25, '\n');
+        if (strcmp(s.usn, usn) == 0)
+        {
+            cout << "\nrecord found";
+            cout << "\n" << s.name << "\t" << s.usn << "\t" << s.age << "\t" << s.sem << "\t" << s.branch;
+            file.close();
+            return;
+        }
+    }
+    cout << "\nrecord not found";
+    file.close();
+}
+
+void display()
+{
+    char extra[25];
+    file.open("records.txt",ios::in);
+    if (!file)
+    {
+        cout << "Error yaya file\n";
+        exit(1);
+    }
+    int i=0;
+    cout << "Name\t\tUSN\t\tAGE\t\tSEM\t\tBRANCH\n";
+    while (!file.eof())
+    {
+        file.getline(s.name, 10, '|');
+        file.getline(s.usn, 10, '|');
+        file.getline(s.age, 5, '|');
+        file.getline(s.sem, 5, '|');
+        file.getline(s.branch, 5, '!');
+        file.getline(extra, 25, '\n');
+
+        cout << s.name << "\t" << s.usn << "\t" << s.age << "\t" << s.sem << "\t" << s.branch << "\n";
+        i++;
+    }
+
+    file.close();
+}
+
+void modify(){
+    char usn[10];
+    char extra[25];
+    char buffer[25];
+    student s[20];
+    
+    file.open("records.txt",ios::in);
+    if(!file){
+        cout << "Kuch gadbad hai daya\n";
+        exit(0);
+    }
+
+    cout << "enter usn to modify\n";
+    cin >> usn;
+    int i = 0,j;
+    while(!file.eof()){
+        file.getline(s[i].name, 10, '|');
+        file.getline(s[i].usn, 10, '|');
+        file.getline(s[i].age, 5, '|');
+        file.getline(s[i].sem, 5, '|');
+        file.getline(s[i].branch, 5, '!');
+        file.getline(extra, 25, '\n');
+        i++;
+    }
+    i--;
+    for(j=0;j<i;j++){
+        if(strcmp(s[j].usn,usn) == 0){
+            cout<<"The old details are\n";
+            cout << s[j].name << "\t" << s[j].usn << "\t" << s[j].age << "\t" << s[j].sem << "\t" << s[j].branch << "\n";
+
+            cout << "Enter new name\n";
+            cin >> s[j].name;
+            cout << "\n" << s[j].name;
+            cout << "\nEnter new usn\n";
+            cin >> s[j].usn;
+            cout << "\n" << s[j].usn;
+            cout << "\nEnter new age\n";
+            cin >> s[j].age;
+            cout << "\n" << s[j].age;
+            cout << "\nEnter new sem\n";
+            cin >> s[j].sem;
+            cout << "\n" << s[j].sem;
+            cout << "\nEnter new branch\n";
+            cin >> s[j].branch;
+            cout << "\n" << s[j].branch;
+            break;
+        }
+    }
+    if(j==i){
+        cout << "The usn is not present\n";
+        return;
+    }
+    file.close();
+    file.open("records.txt",ios::out);
+    if(!file){
+        cout << "lala gadbad kiya\n";
+        return;
+    }
+    for (int k = 0; k < i; k++)
+    {
+        strcpy(buffer,s[k].name);
+        strcat(buffer,"|");
+        strcat(buffer,s[k].usn);
+        strcat(buffer,"|");
+        strcat(buffer,s[k].age);
+        strcat(buffer,"|");
+        strcat(buffer,s[k].sem);
+        strcat(buffer,"|");
+        strcat(buffer,s[k].branch);
+        
+        int count = strlen(buffer);
+        for (int p = 0; p < 25-count; p++)
+        {
+            strcat(buffer,"!");
+        }
+        strcat(buffer,"\n");
+        file << buffer;        
+    }
+    file.close();
+
+}
+
+
+int main()
+{
+    int choice;
+    while (1)
+    {
+        
+        cout << "1.Write Record\n";
+        cout << "2.Search\n";
+        cout << "3.Display\n";
+        cout << "4.Modify\n";
+        cout << "Enter the choice\n";
+        cin >> choice;
+
+        switch (choice)
+        {
+            case 1:
+                write_record();
+                break;
+
+            case 2:
+                search();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4: modify();
+                    break;
+
+            default:
+                cout << "Invalid choice\n";
+                break;
+        }
+    }
+
+    return 0;
+}
